@@ -1,0 +1,15 @@
+definition:
+  PaginationModel:
+    properties:
+      pageIndex:
+        type: integer
+        minimum: 1
+      pageSize:
+        type: integer
+        minimum: 1
+      totalPageCount:
+        type: integer
+        minimum: 0
+      totalItemCount:
+        type: integer
+        minimum: 0

@@ -1,0 +1,133 @@
+definition:
+  UserModel:
+    properties:
+      id:
+        type: string
+      account:
+        type: string
+      password:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      email:
+        type: string
+      portrait:
+        description: portrait url
+        type: string
+      portrait_large:
+        description: large portrait url
+        type: string
+      num_id:
+        description: unique id in number
+        type: integer
+      data:
+        description: extra user data
+        type: object
+  UserCreationBody:
+    required:
+      - account
+      - password
+    properties:
+      account:
+        type: string
+      password:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      email:
+        type: string
+      portrait:
+        type: string
+      portrait_large:
+        type: string
+      data:
+        type: object
+
+parameter:
+  userId:
+    name: user_id
+    in: path
+    required: true
+    description: unique user id
+    type: string
+  userCreationBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: "#/definitions/UserCreationBody"
+  queryUserId:
+    name: id
+    in: query
+    description: user id
+    required: false
+    type: string
+  queryAccount:
+    name: account
+    in: query
+    description: user account
+    required: false
+    type: string
+  queryPassword:
+    name: password
+    in: query
+    description: user password
+    required: false
+    type: string
+  queryPhone:
+    name: phone
+    in: query
+    description: user phone number
+    required: false
+    type: string
+  queryEmail:
+    name: email
+    in: query
+    description: user email address
+    required: false
+    type: string
+
+response:
+  UserQueryResult:
+    description: Success
+    schema:
+      properties:
+        code:
+          type: integer
+          default: 200
+        data:
+          properties:
+            app:
+              type: string
+            users:
+              type: array
+              items:
+                $ref: "#/definitions/UserModel"
+            pagination:
+                $ref: "#/definitions/PaginationModel"
+  UserCreationResult:
+    description: Success
+    schema:
+      properties:
+        code:
+          type: integer
+          default: 200
+        data:
+          properties:
+            id:
+              type: string
+            app:
+              type: string
+  UserResult:
+    description: Success
+    schema:
+      properties:
+        code:
+          type: integer
+          default: 200
+        data:
+          $ref: "#/definitions/UserModel"
