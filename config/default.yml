@@ -1,1 +1,30 @@
-connectionString: "mongodb://127.0.0.1/swagger-api-demo"
+# Server port
+port: 3000
+
+# Redis
+redis:
+  host: "127.0.0.1"
+  port: 6379
+  option:
+
+# MongoDB Connections
+mongoConnectionStrings:
+  demo: "mongodb://127.0.0.1/api-demo"
+  logs: "mongodb://127.0.0.1/api-logs"
+
+# Security
+security:
+  apiKey: "5axexusUch2phejewAFrubruneSeresW"
+  saltRounds: 10
+
+# Sessions
+sessions:
+  namespace: "API-DEMO:SESSIONS"
+  defaultAPP: Demo
+  defaultTTL: 7200
+
+# Verification Code Service
+vcodeService:
+  key: "API-DEMO:VCODES"
+  defaultLength: 4
+  defaultExpires: 300

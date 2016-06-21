@@ -1,0 +1,227 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: Swagger API Demo
+host: localhost:3000
+# basePath prefixes all resource paths
+basePath: /api/v1
+#
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+# security
+securityDefinitions:
+  apiKey:
+    name: X-API-KEY
+    type: apiKey
+    in: header
+paths:
+  /:
+    x-swagger-router-controller: index
+    get:
+      description: Hello World
+      operationId: default
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+  /users:
+    x-swagger-router-controller: users
+    get:
+      description: Query users
+      operationId: queryUsers
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+      responses:
+        200:
+          description: Success
+        default:
+          description: Error
+# parameters
+parameters:
+  apiKey:
+    name: X-API-KEY
+    in: header
+    description: api key for auth
+    type: string
+    default: 5axexusUch2phejewAFrubruneSeresW
+# complex objects have schema definitions
+definitions:
+  # pagination model
+  PaginationModel:
+    properties:
+      pageIndex:
+        description: page index from 1
+        type: integer
+        minimum: 1
+      pageSize:
+        description: page size
+        type: integer
+        minimum: 1
+      totalPageCount:
+        description: total page count
+        type: integer
+        minimum: 0
+      totalItemCount:
+        description: total item count
+        type: integer
+        minimum: 0
+  # user models
+  UserModel:
+    properties:
+      id:
+        description: user id
+        type: string
+      phone:
+        description: unique user phone number
+        type: string
+      email:
+        description: unique user email address
+        type: string
+      fullname:
+        description: user fullname or real name
+        type: string
+      nickname:
+        description: user nickname or display name
+        type: string
+      gender:
+        description: user gender ( 0 for not set, 1 for male, 2 for female )
+        type: integer
+      birthday:
+        description: user birthday in timestamp
+        type: integer
+      created_at:
+        description: user creation time in timestamp
+        type: integer
+      portrait:
+        description: user portrait url
+        type: string
+  UserCreationBody:
+    properties:
+      phone:
+        description: user phone number
+        type: string
+        pattern: "^(\\d{11})$"
+      email:
+        description: user email address
+        type: string
+        pattern: "^(\\w)+(\\.\\w+)*@(\\w)+((\\.\\w+)+)$"
+      password:
+        description: password, required when create with email
+        type: string
+        minLength: 6
+        maxLength: 32
+      fullname:
+        description: fullname or real name
+        type: string
+      nickname:
+        description: nickname or display name
+        type: string
+      gender:
+        description: gender ( 0 for not set, 1 for male, 2 for female )
+        type: integer
+        minimum: 0
+        maximum: 2
+        default: 0
+      birthday:
+        description: birthday in timestamp
+        type: integer
+  UserModificationBody:
+    minProperties: 1
+    properties:
+      phone:
+        description: set to update phone number
+        type: string
+      email:
+        description: set to update email address
+        type: string
+      fullname:
+        description: set to update fullname
+        type: string
+      nickname:
+        description: set to update nickname
+        type: string
+      gender:
+        description: set to update gender
+        type: integer
+        minimum: 0
+        maximum: 2
+      birthday:
+        description: set to update birthday
+        type: integer
+      portrait:
+        description: set to update portrait url
+        type: string
+  UserPasswordModificationBody:
+    required:
+      - old_password
+      - new_password
+    properties:
+      old_password:
+        description: the original password
+        type: string
+      new_password:
+        description: the new password
+        type: string
+      revoke_sessions:
+        description: whether to revoke sessions after password is modified successfully
+        type: boolean
+        default: false
+  # session models
+  SessionModel:
+    properties:
+      uid:
+        description: user id
+        type: string
+      token:
+        description: session tokem
+        type: string
+      ttl:
+        description: session time to live in seconds
+        type: integer
+      data:
+        description: user data in session
+        type: object
+  SessionCreationBody:
+    properties:
+      ip:
+        description: ip of client/agent
+        type: string
+      ttl:
+        description: session time to live in seconds
+        type: integer
+        default: 7200
+      data:
+        description: user data in session
+        type: object
+  SessionDataModificationBody:
+    properties:
+      data:
+        description: user data in session
+        type: object
+  HelloWorldResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string

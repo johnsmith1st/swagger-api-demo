@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node src/app.js",
+    "test": "mocha test/tests.js"
   },
   "dependencies": {
+    "async": "^2.0.0-rc.6",
     "bcrypt": "^0.8.7",
     "bluebird": "^3.4.0",
     "body-parser": "~1.13.2",
@@ -25,5 +27,10 @@
     "swagger-jsdoc": "^1.3.0",
     "swagger-tools": "^0.10.1",
     "tracer": "^0.8.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1",
+    "mocha": "^2.5.3"
   }
 }
