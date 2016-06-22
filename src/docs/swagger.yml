@@ -22,11 +22,13 @@ securityDefinitions:
     name: X-API-KEY
     type: apiKey
     in: header
+
 paths:
   /:
     x-swagger-router-controller: index
     get:
-      description: Hello World
+      summary: Greeting
+      description: returns "Hello World" as a message
       operationId: default
       security:
         - apiKey: []
@@ -34,23 +36,233 @@ paths:
         - $ref: "#/parameters/apiKey"
       responses:
         200:
-          description: Success
+          $ref: "#/responses/ApiResponse"
         default:
-          description: Error
+          $ref: "#/responses/ErrorResponse"
   /users:
     x-swagger-router-controller: users
     get:
-      description: Query users
+      summary: Query users
+      description: Query users by id, phone and email. Supports multiple id query, fields selection, and pagination.
       operationId: queryUsers
       security:
         - apiKey: []
       parameters:
         - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/queryUserId"
+        - $ref: "#/parameters/queryUserPhone"
+        - $ref: "#/parameters/queryUserEmail"
+        - $ref: "#/parameters/queryFields"
+        - $ref: "#/parameters/queryPageIndex"
+        - $ref: "#/parameters/queryPageSize"
       responses:
         200:
-          description: Success
+          $ref: "#/responses/UserQueryResultResponse"
         default:
-          description: Error
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+    post:
+      summary: Create a new user
+      description: |
+        Create a new user and return the user info.
+        Because phone and email are unique for each user, so if phone or email is duplicated, the creation fails.
+      operationId: createUser
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userCreationBody"
+      responses:
+        200:
+          $ref: "#/responses/UserResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+  /users/{user_id}:
+    x-swagger-router-controller: users
+    get:
+      summary: Get user information
+      description: Get user information by user id, phone, email or session token. Supports fields selection.
+      operationId: getUser
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+        - $ref: "#/parameters/queryFields"
+      responses:
+        200:
+          $ref: "#/responses/UserResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+    patch:
+      summary: Update user information
+      description: Update user and return the updated user. Each field in body will be updated.
+      operationId: updateUser
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+        - $ref: "#/parameters/userModificationBody"
+      responses:
+        200:
+          $ref: "#/responses/UserResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+    delete:
+      summary: Delete user
+      description: Delete user. Note that data won't actually delete from database.
+      operationId: deleteUser
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+      responses:
+        200:
+          $ref: "#/responses/ApiResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+  /users/{user_id}/password:
+    x-swagger-router-controller: users
+    patch:
+      summary: Update user password
+      description: |
+        Update user password by providing both old password and new password.
+        Supports revoking all the sessions of user after password has been updated.
+      operationId: updateUserPassword
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+        - $ref: "#/parameters/userPasswordModificationBody"
+      responses:
+        200:
+          $ref: "#/responses/ApiResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+  /users/{user_id}/sessions:
+    x-swagger-router-controller: users
+    get:
+      summary: Get user sessions
+      description: Get all sessions of user.
+      operationId: getUserSessions
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+      responses:
+        200:
+          $ref: "#/responses/SessionQueryResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+        - User Sessions
+    post:
+      summary: Create user session
+      description: Create a new sessions for user. Should provide ip of user client for creation.
+      operationId: createUserSession
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+        - $ref: "#/parameters/sessionCreationBody"
+      responses:
+        200:
+          $ref: "#/responses/SessionResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+        - User Sessions
+    delete:
+      summary: Delete user sessions
+      description: Delete all sessions of user.
+      operationId: deleteUserSession
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/userId"
+      responses:
+        200:
+          $ref: "#/responses/ApiResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Management
+        - User Sessions
+  /sessions/{session_token}:
+    x-swagger-router-controller: sessions
+    get:
+      summary: Get session
+      description: Get session by token.
+      operationId: getSession
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/sessionToken"
+      responses:
+        200:
+          $ref: "#/responses/SessionResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - Session Management
+    delete:
+      summary: Delete session
+      description: Delete session by token.
+      operationId: deleteSession
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/sessionToken"
+      responses:
+        200:
+          $ref: "#/responses/ApiResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - Session Management
+  /sessions/{session_token}/data:
+    patch:
+      summary: Update session data
+      description: |
+        Update session data by supplying token and data.
+        The data object contains a simple key/value list where values can be string, number, boolean or null.
+        To remove keys set them to null. Keys that are not supplied will not be touched.
+      operationId: updateSessionData
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/sessionToken"
+        - $ref: "#/parameters/sessionDataModificationBody"
+      responses:
+        200:
+          $ref: "#/responses/ApiResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - Session Management
+
 # parameters
 parameters:
   apiKey:
@@ -59,9 +271,109 @@ parameters:
     description: api key for auth
     type: string
     default: 5axexusUch2phejewAFrubruneSeresW
+  queryPageSize:
+    name: pageSize
+    in: query
+    required: false
+    description: query page size
+    type: integer
+    minimum: 1
+  queryPageIndex:
+    name: pageIndex
+    in: query
+    required: false
+    description: query page index from 1
+    type: integer
+    minimum: 1
+  queryFields:
+    name: fields
+    in: query
+    required: false
+    description: fields to return in api result, fields separate by comma (,)
+    type: string
+  queryUserId:
+    name: id
+    in: query
+    description: query user by id, support multiple id separated by comma (,)
+    required: false
+    type: string
+  queryUserPhone:
+    name: phone
+    in: query
+    description: query user by phone number
+    required: false
+    type: string
+  queryUserEmail:
+    name: email
+    in: query
+    description: query user by email address
+    required: false
+    type: string
+  userId:
+    name: user_id
+    in: path
+    required: true
+    description: user id
+    type: string
+  userCreationBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: "#/definitions/UserCreationBody"
+  userModificationBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: "#/definitions/UserModificationBody"
+  userPasswordModificationBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: "#/definitions/UserPasswordModificationBody"
+  sessionToken:
+    name: session_token
+    in: path
+    required: true
+    description: session token
+    type: string
+  sessionCreationBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: "#/definitions/SessionCreationBody"
+  sessionDataModificationBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: "#/definitions/SessionDataModificationBody"
 # complex objects have schema definitions
 definitions:
-  # pagination model
+  ApiResult:
+    additionalProperties: true
+    properties:
+      code:
+        description: http response status code
+        type: integer
+        default: 200
+  ApiError:
+    properties:
+      code:
+        description: http response status code
+        type: integer
+      error_code:
+        description: code to identify error
+        type: string
+      error_message:
+        description: message describe the error briefly
+        type: string
+      error_detail:
+        description: error detail information to local the error
+        type: string
   PaginationModel:
     properties:
       pageIndex:
@@ -80,7 +392,6 @@ definitions:
         description: total item count
         type: integer
         minimum: 0
-  # user models
   UserModel:
     properties:
       id:
@@ -181,7 +492,26 @@ definitions:
         description: whether to revoke sessions after password is modified successfully
         type: boolean
         default: false
-  # session models
+  UserResult:
+    allOf:
+      - "$ref": "#/definitions/ApiResult"
+    properties:
+      data:
+        properties:
+          user:
+            $ref: "#/definitions/UserModel"
+  UserQueryResult:
+    allOf:
+      - "$ref": "#/definitions/ApiResult"
+    properties:
+      data:
+        properties:
+          users:
+            type: array
+            items:
+              $ref: "#/definitions/UserModel"
+          pagination:
+              $ref: "#/definitions/PaginationModel"
   SessionModel:
     properties:
       uid:
@@ -213,15 +543,47 @@ definitions:
       data:
         description: user data in session
         type: object
-  HelloWorldResponse:
-    required:
-      - message
+  SessionResult:
+    allOf:
+      - "$ref": "#/definitions/ApiResult"
     properties:
-      message:
-        type: string
+      data:
+        properties:
+          session:
+            $ref: "#/definitions/SessionModel"
+  SessionQueryResult:
+    allOf:
+      - "$ref": "#/definitions/ApiResult"
+    properties:
+      data:
+        properties:
+          sessions:
+            type: array
+            items:
+              $ref: "#/definitions/UserModel"
+# responses
+responses:
+  ApiResponse:
+    description: Success
+    schema:
+      $ref: "#/definitions/ApiResult"
   ErrorResponse:
-    required:
-      - message
-    properties:
-      message:
-        type: string
+    description: Error
+    schema:
+      $ref: "#/definitions/ApiError"
+  UserResultResponse:
+    description: Success
+    schema:
+      $ref: "#/definitions/UserResult"
+  UserQueryResultResponse:
+    description: Success
+    schema:
+      $ref: "#/definitions/UserQueryResult"
+  SessionResultResponse:
+    description: Success
+    schema:
+      $ref: "#/definitions/SessionResult"
+  SessionQueryResultResponse:
+    description: Success
+    schema:
+      $ref: "#/definitions/SessionQueryResult"

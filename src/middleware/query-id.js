@@ -9,5 +9,4 @@ module.exports = function queryId(req, res, next) {
   let arr = id.split(',');
   req.query.id = arr.length > 1 ? arr : id;
   return next();
-
 };
