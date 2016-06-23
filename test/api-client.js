@@ -28,11 +28,11 @@ module.exports.deleteUser = function deleteUser(uid) {
 };
 
 module.exports.updateUser = function updateUser(uid, body) {
-  return chai.request(apiV1).put(`/users/${uid}`).set('X-API-KEY', apiKey).send(body || {});
+  return chai.request(apiV1).patch(`/users/${uid}`).set('X-API-KEY', apiKey).send(body || {});
 };
 
 module.exports.updateUserPassword = function updateUserPassword(uid, body) {
-  return chai.request(apiV1).put(`/users/${uid}/password`).set('X-API-KEY', apiKey).send(body || {});
+  return chai.request(apiV1).patch(`/users/${uid}/password`).set('X-API-KEY', apiKey).send(body || {});
 };
 
 module.exports.getUserSessions = function getUserSessions(uid) {
@@ -51,8 +51,8 @@ module.exports.getSession = function getSession(token) {
   return chai.request(apiV1).get(`/sessions/${token}`).set('X-API-KEY', apiKey);
 };
 
-module.exports.updateSession = function updateSession(token, data) {
-  return chai.request(apiV1).put(`/sessions/${token}/data`).set('X-API-KEY', apiKey).send({ data });
+module.exports.updateSessionData = function updateSessionData(token, data) {
+  return chai.request(apiV1).patch(`/sessions/${token}/data`).set('X-API-KEY', apiKey).send({ data });
 };
 
 module.exports.deleteSession = function deleteSession(token) {
