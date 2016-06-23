@@ -28,4 +28,4 @@ let userSchema = new mongoose.Schema({
 });
 
 module.exports.UserModel = dbConn.model('User', userSchema);
-module.exports.UserDefaultFields = ['id', 'phone', 'email', 'fullname', 'nickname', 'gender', 'birthday', 'portrait', 'tags', 'created_at' ];
+module.exports.UserDefaultFields = ['id', 'phone', 'email', 'fullname', 'nickname', 'gender', 'birthday', 'portrait', 'created_at' ];
