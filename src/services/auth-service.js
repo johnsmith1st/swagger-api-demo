@@ -14,6 +14,9 @@ let sessionService = require('./session-service');
  * @param {object} [sessionOpts.data] - initial user session data
  */
 function basicAuth(account, password, sessionOpts) {
+  console.log('account:', account);
+  console.log('password:', password);
+  console.log('sessionOpts:', sessionOpts);
   return userService
     .validateUserPassword(account, password)
     .then(user => {

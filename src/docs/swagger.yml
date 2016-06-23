@@ -44,7 +44,7 @@ paths:
     post:
       summary: User authentication
       description: Validate user by account and password and create session for user. Use as user login.
-      operationId: basicAuth
+      operationId: auth
       security:
         - apiKey: []
       parameters:
@@ -211,7 +211,7 @@ paths:
     delete:
       summary: Delete user sessions
       description: Delete all sessions of user.
-      operationId: deleteUserSession
+      operationId: deleteUserSessions
       security:
         - apiKey: []
       parameters:
@@ -260,6 +260,7 @@ paths:
       tags:
         - Session Management
   /sessions/{session_token}/data:
+    x-swagger-router-controller: sessions
     patch:
       summary: Update session data
       description: |

@@ -5,6 +5,6 @@
  */
 module.exports = function queryPagination(req, res, next) {
   if (req.query.pageIndex) req.query.pageIndex = Number.parseInt(req.query.pageIndex);
-  if (req.query.pageSize) req.query.pageIndex = Number.parseInt(req.query.pageSize);
+  if (req.query.pageSize) req.query.pageSize = Number.parseInt(req.query.pageSize);
   return next();
 };

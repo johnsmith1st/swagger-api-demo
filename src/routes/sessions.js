@@ -2,6 +2,7 @@
 
 let sessionService = require('../services/session-service');
 let buildMiddleware = require('../middleware/build-middleware');
+let apiResultWrapper = require('../middleware/api-result-wrapper');
 
 function getSessionToken(req, res, next) {
   req.sessionToken = req.swagger.params.session_token.value;
@@ -13,6 +14,7 @@ function getSessionToken(req, res, next) {
  */
 module.exports.getSession = buildMiddleware(
   getSessionToken,
+  apiResultWrapper('session'),
   (req, res, next) => res.apiPromise(next, sessionService.getSession(req.sessionToken))
 );
 

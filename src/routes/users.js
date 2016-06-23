@@ -3,6 +3,7 @@
 let userService = require('../services/user-service');
 let sessionService = require('../services/session-service');
 let buildMiddleware = require('../middleware/build-middleware');
+let apiResultWrapper = require('../middleware/api-result-wrapper');
 let encodePassword = require('../middleware/encode-password');
 
 function getUserId(req, res, next) {
@@ -25,6 +26,7 @@ module.exports.queryUsers = buildMiddleware(
  */
 module.exports.createUser = buildMiddleware(
   encodePassword('password', 'encoded_password'),
+  apiResultWrapper('user'),
   (req, res, next) => res.apiPromise(next, userService.createUser(req.body))
 );
 
@@ -34,6 +36,7 @@ module.exports.createUser = buildMiddleware(
 module.exports.getUser = buildMiddleware(
   getUserId,
   require('../middleware/query-fields'),
+  apiResultWrapper('user'),
   (req, res, next) => res.apiPromise(next, userService.getUser(req.userId, req.query.fields))
 );
 
@@ -51,6 +54,7 @@ module.exports.deleteUser = buildMiddleware(
  */
 module.exports.updateUser = buildMiddleware(
   getUserId,
+  apiResultWrapper('user'),
   (req, res, next) => res.apiPromise(next, userService.updateUser(req.userId, req.body))
 );
 
@@ -68,7 +72,12 @@ module.exports.updateUserPassword = buildMiddleware(
  */
 module.exports.getUserSessions = buildMiddleware(
   getUserId,
-  (req, res, next) => res.apiPromise(next, sessionService.getUserSessions(req.userId))
+  apiResultWrapper('sessions'),
+  (req, res, next) => {
+    return res.apiPromise(next,
+      userService.getUser(req.userId).then(user => sessionService.getUserSessions(user.id))
+    );
+  }
 );
 
 /**
@@ -76,7 +85,11 @@ module.exports.getUserSessions = buildMiddleware(
  */
 module.exports.deleteUserSessions = buildMiddleware(
   getUserId,
-  (req, res, next) => res.apiPromise(next, sessionService.deleteUserSessions(req.userId))
+  (req, res, next) => {
+    return res.apiPromise(next,
+      userService.getUser(req.userId).then(user => sessionService.deleteUserSessions(user.id))
+    );
+  }
 );
 
 /**
@@ -84,9 +97,10 @@ module.exports.deleteUserSessions = buildMiddleware(
  */
 module.exports.createUserSession = buildMiddleware(
   getUserId,
+  apiResultWrapper('session'),
   (req, res, next) => {
     return res.apiPromise(next,
-      userService.getUser(req.userId).then(() => sessionService.createSession(req.userId, req.body))
+      userService.getUser(req.userId).then(user => sessionService.createSession(user.id, req.body))
     );
   }
 );

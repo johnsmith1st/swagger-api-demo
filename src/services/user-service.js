@@ -39,7 +39,7 @@ function _returnUserInfo(model, fields) {
     birthday: model.birthday && model.birthday.getTime(),
     portrait: model.portrait,
     tags: model.tags,
-    created_at: model.created_at && model.birthday.getTime()
+    created_at: model.created_at && model.created_at.getTime()
   }, fields || UserDefaultFields);
 }
 
@@ -65,7 +65,7 @@ function _guessIdType(id) {
  */
 function _getUserFromRepository(id, type) {
 
-  let condition = { activated: true }, query;
+  let condition = { del_state: 0 }, query;
   let idType = (type && typeof type === 'string' && type.length)
     ? ('*' === type ? _guessIdType(id) : type)
     : 'objectId';
@@ -78,11 +78,13 @@ function _getUserFromRepository(id, type) {
       condition.email = id;
       break;
     default:
-      query = UserModel.findById(id);
+      //query = UserModel.findById(id);
+      condition._id = id;
       break;
   }
 
-  query = query || UserModel.findOne(condition);
+  //query = query || UserModel.findOne(condition);
+  query = UserModel.findOne(condition);
 
   return query
     .exec()
@@ -106,6 +108,7 @@ function _getUserFromRepository(id, type) {
 function _validateUserByPassword(user, password) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, user.password, (err, res) => {
+      logger.error(err);
       if (err) return reject(err);
       if (!res) return reject(ApiError.InvalidUserPassword);
       return resolve(user);
@@ -278,7 +281,7 @@ function updateUser(id, params) {
  * @param {string} params.old_password
  * @param {string} params.new_password
  * @param {string} params.encoded_new_password
- * @param {boolean} [params.revokeSessions]
+ * @param {boolean} [params.revoke_sessions]
  */
 function updateUserPassword(id, params) {
   return _getUserFromRepository(id)
@@ -292,7 +295,7 @@ function updateUserPassword(id, params) {
       return user.save();
     })
     .then(user => {
-      return (params.revokeSessions)
+      return (params.revoke_sessions)
         ? sessionService.deleteUserSessions(id).thenReturn(user)
         : Promise.resolve(user);
     })

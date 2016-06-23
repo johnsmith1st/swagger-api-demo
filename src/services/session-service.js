@@ -33,9 +33,9 @@ function createSession(uid, opts) {
       id: uid,
       ip: opts.ip || '_',
       ttl: opts.ttl || defaultTTL,
-      d: opts.data || { _v: 0 }
+      d: opts.data || { _i: 0 }
     }, (err, session) => {
-      return err ? reject(err) : resolve({ uid: opts.uid, token: session.token });
+      return err ? reject(err) : resolve({ uid, token: session.token });
     });
   });
 }
