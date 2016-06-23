@@ -39,6 +39,24 @@ paths:
           $ref: "#/responses/ApiResponse"
         default:
           $ref: "#/responses/ErrorResponse"
+  /auth:
+    x-swagger-router-controller: auth
+    post:
+      summary: User authentication
+      description: Validate user by account and password and create session for user. Use as user login.
+      operationId: basicAuth
+      security:
+        - apiKey: []
+      parameters:
+        - $ref: "#/parameters/apiKey"
+        - $ref: "#/parameters/basicAuthBody"
+      responses:
+        200:
+          $ref: "#/responses/AuthResultResponse"
+        default:
+          $ref: "#/responses/ErrorResponse"
+      tags:
+        - User Auth
   /users:
     x-swagger-router-controller: users
     get:
@@ -171,7 +189,7 @@ paths:
           $ref: "#/responses/ErrorResponse"
       tags:
         - User Management
-        - User Sessions
+        - User Sessions Management
     post:
       summary: Create user session
       description: Create a new sessions for user. Should provide ip of user client for creation.
@@ -189,7 +207,7 @@ paths:
           $ref: "#/responses/ErrorResponse"
       tags:
         - User Management
-        - User Sessions
+        - User Sessions Management
     delete:
       summary: Delete user sessions
       description: Delete all sessions of user.
@@ -206,7 +224,7 @@ paths:
           $ref: "#/responses/ErrorResponse"
       tags:
         - User Management
-        - User Sessions
+        - User Sessions Management
   /sessions/{session_token}:
     x-swagger-router-controller: sessions
     get:
@@ -351,6 +369,12 @@ parameters:
     required: true
     schema:
       $ref: "#/definitions/SessionDataModificationBody"
+  basicAuthBody:
+      name: body
+      in: body
+      required: true
+      schema:
+        $ref: "#/definitions/BasicAuthBody"
 # complex objects have schema definitions
 definitions:
   ApiResult:
@@ -374,6 +398,7 @@ definitions:
       error_detail:
         description: error detail information to local the error
         type: string
+
   PaginationModel:
     properties:
       pageIndex:
@@ -561,6 +586,50 @@ definitions:
             type: array
             items:
               $ref: "#/definitions/UserModel"
+  AuthSessionOptions:
+    required:
+      - mode
+    properties:
+      mode:
+        description: session creation mode, none for not creating session
+        type: string
+        enum:
+          - none
+          - exclusive
+          - independent
+      ip:
+        description: ip address of user client/agent
+        type: string
+      ttl:
+        description: ip address of user client/agent
+        type: number
+      data:
+        description: initial data for user session
+        type: object
+  BasicAuthBody:
+    required:
+      - account
+      - password
+      - session_opts
+    properties:
+      account:
+        description: phone or email as account
+        type: string
+      password:
+        description: password to validate
+        type: string
+      session_opts:
+        $ref: "#/definitions/AuthSessionOptions"
+  AuthResult:
+    allOf:
+      - "$ref": "#/definitions/ApiResult"
+    properties:
+      data:
+        properties:
+          user:
+            $ref: "#/definitions/UserModel"
+          session:
+            $ref: "#/definitions/SessionModel"
 # responses
 responses:
   ApiResponse:
@@ -587,3 +656,8 @@ responses:
     description: Success
     schema:
       $ref: "#/definitions/SessionQueryResult"
+
+  AuthResultResponse:
+      description: Success
+      schema:
+        $ref: "#/definitions/AuthResult"

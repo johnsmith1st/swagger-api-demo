@@ -99,13 +99,16 @@ function _getUserFromRepository(id, type) {
 
 /**
  * Validate password.
+ * @param user
  * @param {string} password
- * @param {string} hash
+ * @private
  */
-function validatePassword(password, hash) {
+function _validateUserByPassword(user, password) {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(password, hash, (err, res) => {
-      return err ? reject(err) : resolve(res);
+    bcrypt.compare(password, user.password, (err, res) => {
+      if (err) return reject(err);
+      if (!res) return reject(ApiError.InvalidUserPassword);
+      return resolve(user);
     });
   });
 }
@@ -280,25 +283,20 @@ function updateUser(id, params) {
 function updateUserPassword(id, params) {
   return _getUserFromRepository(id)
     .then(user => {
-      // password not set
-      if (!(user.password)) {
-        user.password = params.encoded_new_password;
-        return user.save();
-      }
-      // validate password and update
-      return validatePassword(params.old_password, user.password)
-        .then(isValid => {
-          if (!isValid) throw ApiError.InvalidUserPassword;
-          user.password = params.encoded_new_password;
-          return user.save();
-        });
+      return user.password
+        ? _validateUserByPassword(user, params.old_password)  // validate password
+        : user;                                               // password not set
+    })
+    .then(user => {
+      user.password = params.encoded_new_password;
+      return user.save();
     })
     .then(user => {
       return (params.revokeSessions)
         ? sessionService.deleteUserSessions(id).thenReturn(user)
         : Promise.resolve(user);
     })
-    .then(user => _returnUserInfo(user, UserDefaultFields));
+    .then(user => _returnUserInfo(user));
 }
 
 /**
@@ -314,10 +312,31 @@ function deleteUser(id) {
     .then(user => user.del_state);
 }
 
+/**
+ * Validate user password.
+ * @param {string} id
+ * @param {string} password
+ */
+function validateUserPassword(id, password) {
+
+  if (!password)
+    return Promise.reject(ApiError.InvalidUserPassword);
+
+  // check id type to avoid id is the object id
+  let idType = _guessIdType(id);
+  if (idType !== 'phone' && idType !== 'email')
+    return Promise.reject(ApiError.InvalidUserAccount);
+
+  return _getUserFromRepository(id, idType)
+    .then(user => _validateUserByPassword(user, password))
+    .then(user => _returnUserInfo(user));
+}
+
 module.exports.queryUsers = queryUsers;
 module.exports.createUser = createUser;
 module.exports.getUser = getUser;
 module.exports.updateUser = updateUser;
-module.exports.updateUserPassword = updateUserPassword;
 module.exports.deleteUser = deleteUser;
+module.exports.updateUserPassword = updateUserPassword;
+module.exports.validateUserPassword = validateUserPassword;
 module.exports.UserModel = UserModel;

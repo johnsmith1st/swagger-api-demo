@@ -9,9 +9,10 @@ const ERRORS = {
   RequireUserAccount:       [ '40011', 'REQUIRE_USER_ACCOUNT', 'Required phone, or email in request body' ],
   RequireUserPassword:      [ '40012', 'REQUIRE_USER_PASSWORD', 'Required password in request body' ],
   InvalidUserId:            [ '40013', 'INVALID_USER_ID', 'Invalid user id' ],
-  InvalidUserPassword:      [ '40014', 'INVALID_USER_PASSWORD', 'Invalid user password' ],
-  DuplicatedUserPhone:      [ '40015', 'DUPLICATED_USER_PHONE', 'Duplicated user phone' ],
-  DuplicatedUserEmail:      [ '40016', 'DUPLICATED_USER_EMAIL', 'Duplicated user email' ],
+  InvalidUserAccount:       [ '40014', 'INVALID_USER_ACCOUNT', 'Invalid user account' ],
+  InvalidUserPassword:      [ '40015', 'INVALID_USER_PASSWORD', 'Invalid user password' ],
+  DuplicatedUserPhone:      [ '40016', 'DUPLICATED_USER_PHONE', 'Duplicated user phone' ],
+  DuplicatedUserEmail:      [ '40017', 'DUPLICATED_USER_EMAIL', 'Duplicated user email' ],
   InvalidTokenFormat:       [ '40020', 'INVALID_TOKEN_FORMAT', 'Invalid session token format' ],
   InvalidVerificationCode:  [ '40030', 'INVALID_VERIFICATION_CODE', 'Invalid verification code' ],
   UserNotFound:             [ '40401', 'USER_NOT_FOUND', 'User not found' ],
@@ -52,6 +53,10 @@ class ApiError extends Error {
 
   static get InvalidUserId() {
     return ApiError.create(ERRORS.InvalidUserId);
+  }
+
+  static get InvalidUserAccount() {
+    return ApiError.create(ERRORS.InvalidUserAccount);
   }
 
   static get InvalidUserPassword() {

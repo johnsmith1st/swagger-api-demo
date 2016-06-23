@@ -42,14 +42,14 @@ function createSession(uid, opts) {
 
 /**
  * Create unique session.
+ * @param {string} uid
  * @param {object} args
- * @param {string} args.uid
  * @param {string} [args.ip]
  * @param {number} [args.ttl]
  * @param {object} [args.data]
  */
-function createUniqueSession(args) {
-  return deleteUserSessions(args.uid).then(() => createSession(args));
+function createUniqueSession(uid, args) {
+  return deleteUserSessions(uid).then(() => createSession(uid, args));
 }
 
 /**
