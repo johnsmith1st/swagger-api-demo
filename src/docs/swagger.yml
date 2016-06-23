@@ -585,7 +585,7 @@ definitions:
           sessions:
             type: array
             items:
-              $ref: "#/definitions/UserModel"
+              $ref: "#/definitions/SessionModel"
   AuthSessionOptions:
     required:
       - mode
