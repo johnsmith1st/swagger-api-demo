@@ -6,7 +6,7 @@ let should = chai.should();
 let apiClient = require('./api-client');
 let helper = require('./helper');
 
-describe.only('/auth', function() {
+describe('/auth', function() {
 
   describe('POST /auth', function() {
 

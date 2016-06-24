@@ -108,7 +108,6 @@ function _getUserFromRepository(id, type) {
 function _validateUserByPassword(user, password) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, user.password, (err, res) => {
-      logger.error(err);
       if (err) return reject(err);
       if (!res) return reject(ApiError.InvalidUserPassword);
       return resolve(user);

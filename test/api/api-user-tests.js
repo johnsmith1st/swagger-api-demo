@@ -11,7 +11,7 @@ let userService = require('../../src/services/user-service');
 let apiClient = require('./api-client');
 let helper = require('./helper');
 
-describe.only('/users', function() {
+describe('/users', function() {
 
   describe('GET /users', function() {
 
