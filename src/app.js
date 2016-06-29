@@ -5,6 +5,7 @@ let config = require('config');
 let express = require('express');
 let swaggerTools = require('swagger-tools');
 let logger = require('./logger');
+let utils = require('./utils');
 
 let app = express();
 let port = config.get('port');
@@ -16,6 +17,7 @@ app.use(require('./middleware/serv-detect'));
 app.use(require('./middleware/serv-gc'));
 
 let swaggerSpec = require('./docs/swagger');
+swaggerSpec.host = `${utils.getIpAddress()}:${port}`;
 
 let routeOptions = {
   controllers: path.resolve(__dirname, 'routes')
